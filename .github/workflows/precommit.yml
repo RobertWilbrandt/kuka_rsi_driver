@@ -1,0 +1,14 @@
+name: pre-commit
+
+on: [push, pull_request]
+
+jobs:
+  pre-commit:
+    name: pre-commit
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+      - name: Install dependencies
+        run: sudo apt install clang-format-18 clang-tidy-18
+      - uses: pre-commit/action@v3.0.1
