@@ -38,6 +38,8 @@
 #include <array>
 #include <chrono>
 #include <cstdint>
+#include <string>
+#include <vector>
 
 namespace kuka_rsi_driver {
 
@@ -75,6 +77,16 @@ public:
   void getQuaternion(double& x, double& y, double& z, double& w) const;
 };
 
+class RsiConfig
+{
+public:
+  RsiConfig(const std::vector<std::string>& digital_inputs,
+            const std::vector<std::string>& digital_outputs);
+
+  std::vector<std::string> digital_inputs;
+  std::vector<std::string> digital_outputs;
+};
+
 enum class ProgramStatus : std::uint8_t
 {
   RUNNING = 3,
@@ -94,6 +106,8 @@ public:
   CartesianPose cartesian_actual_pos;
   CartesianPose cartesian_setpoint_pos;
 
+  std::vector<bool> digital_inputs;
+
   std::size_t delay;
   std::size_t ipoc;
 
@@ -110,6 +124,8 @@ public:
   std::chrono::steady_clock::time_point write_time;
 
   JointArray axis_command_pos;
+
+  std::vector<bool> digital_outputs;
 
 private:
 };

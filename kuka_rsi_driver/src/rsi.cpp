@@ -103,6 +103,13 @@ void CartesianPose::getQuaternion(double& x, double& y, double& z, double& w) co
   w = ca * cb * cc + sa * sb * sc;
 }
 
+RsiConfig::RsiConfig(const std::vector<std::string>& digital_inputs,
+                     const std::vector<std::string>& digital_outputs)
+  : digital_inputs{digital_inputs}
+  , digital_outputs{digital_outputs}
+{
+}
+
 RsiState::RsiState()
   : delay{0}
   , ipoc{0}

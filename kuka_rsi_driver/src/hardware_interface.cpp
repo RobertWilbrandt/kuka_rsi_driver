@@ -54,6 +54,16 @@ std::vector<hardware_interface::StateInterface> KukaRsiHardwareInterface::export
       info_.joints[i].name, hardware_interface::HW_IF_EFFORT, &m_joint_efforts[i]);
   }
 
+  std::size_t state_if_i = 0;
+  for (const auto& gpio : info_.gpios)
+  {
+    for (const auto& state_interface : gpio.state_interfaces)
+    {
+      state_interfaces.emplace_back(
+        gpio.name, state_interface.name, &m_digital_inputs[state_if_i++]);
+    }
+  }
+
   constexpr std::array cartesian_states = {"position.x",
                                            "position.y",
                                            "position.z",
@@ -81,6 +91,16 @@ KukaRsiHardwareInterface::export_command_interfaces()
   {
     command_interfaces.emplace_back(
       info_.joints[i].name, hardware_interface::HW_IF_POSITION, &m_joint_commands[i]);
+  }
+
+  std::size_t command_if_i = 0;
+  for (const auto& gpio : info_.gpios)
+  {
+    for (const auto& command_interface : gpio.command_interfaces)
+    {
+      command_interfaces.emplace_back(
+        gpio.name, command_interface.name, &m_digital_outputs[command_if_i++]);
+    }
   }
 
   return command_interfaces;
@@ -145,7 +165,29 @@ KukaRsiHardwareInterface::on_init(const hardware_interface::HardwareInfo& /*syst
     }
   }
 
-  m_rsi_factory.emplace();
+  std::vector<std::string> digital_inputs;
+  std::vector<std::string> digital_outputs;
+
+
+  for (const auto& io : info_.gpios)
+  {
+    for (const auto& state_if : io.state_interfaces)
+    {
+      digital_inputs.push_back(state_if.name);
+    }
+
+    for (const auto& command_if : io.command_interfaces)
+    {
+      digital_outputs.push_back(command_if.name);
+    }
+  }
+
+  m_digital_inputs.resize(digital_inputs.size());
+  m_digital_outputs.resize(digital_outputs.size());
+
+  m_rsi_config.emplace(digital_inputs, digital_outputs);
+
+  m_rsi_factory.emplace(*m_rsi_config);
   m_control_buf.emplace(*m_rsi_factory);
 
   const auto listen_address = info_.hardware_parameters["listen_address"];

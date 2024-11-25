@@ -37,8 +37,9 @@
 
 namespace kuka_rsi_driver {
 
-RsiFactory::RsiFactory(std::size_t cyclic_buf_size)
-  : m_cmd_i{0}
+RsiFactory::RsiFactory(const RsiConfig& config, std::size_t cyclic_buf_size)
+  : m_rsi_config{config}
+  , m_cmd_i{0}
   , m_state_i{0}
 {
   m_cmd_buf.reserve(cyclic_buf_size);
@@ -46,8 +47,13 @@ RsiFactory::RsiFactory(std::size_t cyclic_buf_size)
 
   for (std::size_t i = 0; i < cyclic_buf_size; ++i)
   {
-    m_cmd_buf.emplace_back(std::make_shared<RsiCommand>());
-    m_state_buf.emplace_back(std::make_shared<RsiState>());
+    auto state = std::make_shared<RsiState>();
+    state->digital_inputs.resize(m_rsi_config.digital_inputs.size());
+    m_state_buf.emplace_back(std::move(state));
+
+    auto cmd = std::make_shared<RsiCommand>();
+    cmd->digital_outputs.resize(m_rsi_config.digital_outputs.size());
+    m_cmd_buf.emplace_back(std::move(cmd));
   }
 }
 

@@ -75,9 +75,14 @@ public:
 private:
   std::string requiredHardwareParameter(const std::string& name);
 
+  std::optional<RsiConfig> m_rsi_config;
+
   std::vector<double> m_joint_positions;
   std::vector<double> m_joint_commands;
   std::vector<double> m_joint_efforts;
+
+  std::vector<double> m_digital_inputs;
+  std::vector<double> m_digital_outputs;
 
   std::vector<double> m_cartesian_position;
 
