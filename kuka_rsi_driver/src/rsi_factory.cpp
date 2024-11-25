@@ -59,7 +59,9 @@ RsiFactory::RsiFactory(const RsiConfig& config, std::size_t cyclic_buf_size)
 
 RsiCommand RsiFactory::createCommand() const
 {
-  return RsiCommand{};
+  RsiCommand result;
+  result.digital_outputs.resize(m_rsi_config.digital_outputs.size());
+  return result;
 }
 
 std::shared_ptr<RsiCommand> RsiFactory::createCyclicCommand()

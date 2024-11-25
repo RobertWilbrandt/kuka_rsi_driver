@@ -128,6 +128,18 @@ void interpolate(const RsiCommand& c1, const RsiCommand& c2, double alpha, RsiCo
     dest.axis_command_pos[i] =
       (1 - alpha) * c1.axis_command_pos[i] + alpha * c2.axis_command_pos[i];
   }
+
+  for (std::size_t i = 0; i < c1.digital_outputs.size(); ++i)
+  {
+    if (alpha >= 0.5)
+    {
+      dest.digital_outputs[i] = c2.digital_outputs[i];
+    }
+    else
+    {
+      dest.digital_outputs[i] = c1.digital_outputs[i];
+    }
+  }
 }
 
 } // namespace kuka_rsi_driver

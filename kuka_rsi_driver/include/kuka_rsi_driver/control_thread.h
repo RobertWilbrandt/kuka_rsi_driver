@@ -53,7 +53,8 @@ class ControlBuffer;
 class ControlThread
 {
 public:
-  ControlThread(const std::string& sentype,
+  ControlThread(const RsiConfig* config,
+                const std::string& sentype,
                 const std::string& listen_address,
                 unsigned short listen_port,
                 ControlBuffer* control_buf,

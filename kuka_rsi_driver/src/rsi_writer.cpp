@@ -65,6 +65,17 @@ void TextWriter::writeText(std::string_view text)
   m_head += text.size();
 }
 
+void TextWriter::writeBool(bool v)
+{
+  if (static_cast<std::size_t>(m_head - &m_target[0]) >= m_target.size())
+  {
+    throw std::runtime_error{"Invalid buffer space"};
+  }
+
+  *m_head = v ? '1' : '0';
+  ++m_head;
+}
+
 void TextWriter::writeNumber(std::size_t v)
 {
   const auto [ptr, ec] = std::to_chars(m_head, &m_target[m_target.size() - 1], v);
@@ -90,8 +101,12 @@ void TextWriter::writeNumber(double v)
   m_head = ptr;
 }
 
-RsiWriter::RsiWriter(const std::string& sentype, rclcpp::Logger log, std::size_t buf_size)
+RsiWriter::RsiWriter(const RsiConfig* config,
+                     const std::string& sentype,
+                     rclcpp::Logger log,
+                     std::size_t buf_size)
   : m_log{std::move(log)}
+  , m_rsi_config{config}
   , m_sentype{sentype}
   , m_writer{m_log}
 {
@@ -104,6 +119,7 @@ std::size_t RsiWriter::writeCommand(const RsiCommand& cmd, std::size_t ipoc, std
   m_writer.writeText(m_sentype);
   m_writer.writeText("\">");
 
+  // Write joint position command
   m_writer.writeText("<AK ");
   for (std::size_t i = 0; i < cmd.axis_command_pos.size(); ++i)
   {
@@ -113,8 +129,26 @@ std::size_t RsiWriter::writeCommand(const RsiCommand& cmd, std::size_t ipoc, std
     m_writer.writeNumber(cmd.axis_command_pos[i]);
     m_writer.writeText("\" ");
   }
+  m_writer.writeText("/>");
 
-  m_writer.writeText("/><IPOC>");
+  // Write digital outputs
+  if (!m_rsi_config->digital_inputs.empty() || !m_rsi_config->digital_outputs.empty())
+  {
+    m_writer.writeText("<IO");
+
+    for (std::size_t i = 0; i < m_rsi_config->digital_outputs.size(); ++i)
+    {
+      m_writer.writeText(" ");
+      m_writer.writeText(m_rsi_config->digital_outputs[i]);
+      m_writer.writeText("=\"");
+      m_writer.writeBool(cmd.digital_outputs[i]);
+      m_writer.writeText("\"");
+    }
+
+    m_writer.writeText(" />");
+  }
+
+  m_writer.writeText("<IPOC>");
   m_writer.writeNumber(ipoc);
   m_writer.writeText("</IPOC></Sen>");
 

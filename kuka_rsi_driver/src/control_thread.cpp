@@ -41,7 +41,8 @@
 
 namespace kuka_rsi_driver {
 
-ControlThread::ControlThread(const std::string& sentype,
+ControlThread::ControlThread(const RsiConfig* config,
+                             const std::string& sentype,
                              const std::string& listen_address,
                              unsigned short listen_port,
                              ControlBuffer* control_buf,
@@ -50,7 +51,7 @@ ControlThread::ControlThread(const std::string& sentype,
   : m_log{std::move(log)}
   , m_udp_server{listen_address, listen_port, std::chrono::milliseconds{1}}
   , m_rsi_parser{m_log, rsi_factory}
-  , m_rsi_writer{sentype, m_log}
+  , m_rsi_writer{config, sentype, m_log}
   , m_control_buf{control_buf}
   , m_initial_cmd{rsi_factory->createCommand()}
   , m_rsi_cmd{rsi_factory->createCommand()}
@@ -142,6 +143,10 @@ void ControlThread::run()
       for (std::size_t i = 0; i < 6; ++i)
       {
         m_rsi_cmd.axis_command_pos[i] = cmd->axis_command_pos[i] - (*m_cmd_offset)[i];
+      }
+      for (std::size_t i = 0; i < cmd->digital_outputs.size(); ++i)
+      {
+        m_rsi_cmd.digital_outputs[i] = cmd->digital_outputs[i];
       }
 
       KUKA_RSI_DRIVER_TRACEPOINT(rsi_packet_sent,

@@ -210,7 +210,8 @@ KukaRsiHardwareInterface::on_init(const hardware_interface::HardwareInfo& /*syst
 
   try
   {
-    m_control_thread.emplace(sentype,
+    m_control_thread.emplace(&(*m_rsi_config),
+                             sentype,
                              listen_address,
                              std::stoi(listen_port),
                              &(*m_control_buf),
@@ -250,6 +251,11 @@ KukaRsiHardwareInterface::on_configure(const rclcpp_lifecycle::State& previous_s
         m_joint_positions[i] = state->axis_actual_pos[i] * M_PI / 180.;
         m_joint_efforts[i]   = state->axis_eff[i];
         m_joint_commands[i]  = m_joint_positions[i];
+      }
+
+      for (std::size_t i = 0; i < m_digital_inputs.size(); ++i)
+      {
+        m_digital_inputs[i] = state->digital_inputs[i] ? 1.0 : 0.0;
       }
 
       m_cartesian_position[0] = state->cartesian_actual_pos.x / 1000;
@@ -305,6 +311,11 @@ hardware_interface::return_type KukaRsiHardwareInterface::read(const rclcpp::Tim
       m_joint_efforts[i]   = state->axis_eff[i];
     }
 
+    for (std::size_t i = 0; i < m_digital_inputs.size(); ++i)
+    {
+      m_digital_inputs[i] = state->digital_inputs[i] ? 1.0 : 0.0;
+    }
+
     m_cartesian_position[0] = state->cartesian_actual_pos.x / 1000;
     m_cartesian_position[1] = state->cartesian_actual_pos.y / 1000;
     m_cartesian_position[2] = state->cartesian_actual_pos.z / 1000;
@@ -347,6 +358,11 @@ hardware_interface::return_type KukaRsiHardwareInterface::write(const rclcpp::Ti
     for (std::size_t i = 0; i < m_joint_commands.size(); ++i)
     {
       cmd->axis_command_pos[i] = m_joint_commands[i] * 180. / M_PI;
+    }
+
+    for (std::size_t i = 0; i < m_digital_outputs.size(); ++i)
+    {
+      cmd->digital_outputs[i] = m_digital_outputs[i] == 0.0 ? false : true;
     }
   }
 

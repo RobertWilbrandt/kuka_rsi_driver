@@ -37,11 +37,12 @@
 
 using namespace kuka_rsi_driver;
 
-TEST(RsiWriter, WriteTestXml)
+TEST(RsiWriter, WriteTestXmlNoIo)
 {
   const auto log = rclcpp::get_logger("rsi_writer");
 
-  RsiWriter writer{"TestSenType", log};
+  RsiConfig config{{}, {}};
+  RsiWriter writer{&config, "TestSenType", log};
 
   // Create test command
   RsiCommand cmd;
@@ -61,6 +62,38 @@ TEST(RsiWriter, WriteTestXml)
   // clang-format off
   const std::string expected_result =
     R"(<Sen Type="TestSenType"><AK A1="0.000000" A2="1.000000" A3="2.000000" A4="3.000000" A5="4.000000" A6="5.000000" /><IPOC>123456</IPOC></Sen>)";
+  // clang-format on
+
+  EXPECT_EQ(expected_result, (std::string_view{buffer.data(), result_size}));
+}
+
+TEST(RsiWriter, WriteTestXmlIo)
+{
+  const auto log = rclcpp::get_logger("rsi_writer");
+
+  RsiConfig config{{}, {"do1", "do2"}};
+  RsiWriter writer{&config, "TestSenType", log};
+
+  // Create test command
+  RsiCommand cmd;
+  for (std::size_t i = 0; i < cmd.axis_command_pos.size(); ++i)
+  {
+    cmd.axis_command_pos[i] = i;
+  }
+
+  cmd.digital_outputs = {true, false};
+
+  // Write command to buffer
+  std::vector<char> buffer;
+  buffer.resize(1024);
+  const auto result_size = writer.writeCommand(cmd, 123456, buffer);
+
+  // Verify sizes
+  ASSERT_GT(result_size, 0);
+
+  // clang-format off
+  const std::string expected_result =
+    R"(<Sen Type="TestSenType"><AK A1="0.000000" A2="1.000000" A3="2.000000" A4="3.000000" A5="4.000000" A6="5.000000" /><IO do1="1" do2="0" /><IPOC>123456</IPOC></Sen>)";
   // clang-format on
 
   EXPECT_EQ(expected_result, (std::string_view{buffer.data(), result_size}));
