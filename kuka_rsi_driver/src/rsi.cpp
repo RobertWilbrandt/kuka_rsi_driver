@@ -103,9 +103,15 @@ void CartesianPose::getQuaternion(double& x, double& y, double& z, double& w) co
   w = ca * cb * cc + sa * sb * sc;
 }
 
-RsiConfig::RsiConfig(const std::vector<std::string>& digital_inputs,
+RsiConfig::RsiConfig(const std::string& sentype,
+                     const std::string& listen_address,
+                     unsigned short listen_port,
+                     const std::vector<std::string>& digital_inputs,
                      const std::vector<std::string>& digital_outputs)
-  : digital_inputs{digital_inputs}
+  : sentype{sentype}
+  , listen_address{listen_address}
+  , listen_port{listen_port}
+  , digital_inputs{digital_inputs}
   , digital_outputs{digital_outputs}
 {
 }

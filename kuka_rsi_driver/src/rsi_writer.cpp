@@ -101,13 +101,9 @@ void TextWriter::writeNumber(double v)
   m_head = ptr;
 }
 
-RsiWriter::RsiWriter(const RsiConfig* config,
-                     const std::string& sentype,
-                     rclcpp::Logger log,
-                     std::size_t buf_size)
+RsiWriter::RsiWriter(const RsiConfig* config, rclcpp::Logger log, std::size_t buf_size)
   : m_log{std::move(log)}
   , m_rsi_config{config}
-  , m_sentype{sentype}
   , m_writer{m_log}
 {
 }
@@ -116,7 +112,7 @@ std::size_t RsiWriter::writeCommand(const RsiCommand& cmd, std::size_t ipoc, std
 {
   m_writer.reset(target);
   m_writer.writeText("<Sen Type=\"");
-  m_writer.writeText(m_sentype);
+  m_writer.writeText(m_rsi_config->sentype);
   m_writer.writeText("\">");
 
   // Write joint position command

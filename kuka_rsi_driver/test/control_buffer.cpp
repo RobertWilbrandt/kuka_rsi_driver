@@ -40,7 +40,7 @@ using namespace kuka_rsi_driver;
 
 TEST(ControlBuffer, interpolation)
 {
-  RsiConfig rsi_config{{}, {}};
+  RsiConfig rsi_config{"TestSenType", "0.0.0.0", 49152, {}, {}};
   RsiFactory rsi_factory{rsi_config};
   ControlBuffer test_buf{rsi_factory};
 

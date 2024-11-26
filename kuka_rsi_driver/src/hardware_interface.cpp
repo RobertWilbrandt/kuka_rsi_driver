@@ -185,10 +185,6 @@ KukaRsiHardwareInterface::on_init(const hardware_interface::HardwareInfo& /*syst
   m_digital_inputs.resize(digital_inputs.size());
   m_digital_outputs.resize(digital_outputs.size());
 
-  m_rsi_config.emplace(digital_inputs, digital_outputs);
-
-  m_rsi_factory.emplace(*m_rsi_config);
-  m_control_buf.emplace(*m_rsi_factory);
 
   const auto listen_address = info_.hardware_parameters["listen_address"];
   const auto listen_port    = info_.hardware_parameters["listen_port"];
@@ -208,15 +204,15 @@ KukaRsiHardwareInterface::on_init(const hardware_interface::HardwareInfo& /*syst
     sentype = sentype_it->second;
   }
 
+  m_rsi_config.emplace(
+    sentype, listen_address, std::stoi(listen_port), digital_inputs, digital_outputs);
+
+  m_rsi_factory.emplace(*m_rsi_config);
+  m_control_buf.emplace(*m_rsi_factory);
+
   try
   {
-    m_control_thread.emplace(&(*m_rsi_config),
-                             sentype,
-                             listen_address,
-                             std::stoi(listen_port),
-                             &(*m_control_buf),
-                             &(*m_rsi_factory),
-                             get_logger());
+    m_control_thread.emplace(&(*m_rsi_config), &(*m_control_buf), &(*m_rsi_factory), get_logger());
   }
   catch (std::exception& ex)
   {

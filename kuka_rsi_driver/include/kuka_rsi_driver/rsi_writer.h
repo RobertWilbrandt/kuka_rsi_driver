@@ -73,10 +73,7 @@ private:
 class RsiWriter
 {
 public:
-  RsiWriter(const RsiConfig* config,
-            const std::string& sentype,
-            rclcpp::Logger log,
-            std::size_t buf_size = 1024);
+  RsiWriter(const RsiConfig* config, rclcpp::Logger log, std::size_t buf_size = 1024);
 
   [[nodiscard]] std::size_t
   writeCommand(const RsiCommand& cmd, std::size_t ipoc, std::span<char> target);
@@ -85,8 +82,6 @@ private:
   rclcpp::Logger m_log;
 
   const RsiConfig* m_rsi_config;
-
-  std::string m_sentype;
 
   TextWriter m_writer;
 };

@@ -80,8 +80,15 @@ public:
 class RsiConfig
 {
 public:
-  RsiConfig(const std::vector<std::string>& digital_inputs,
+  RsiConfig(const std::string& sentype,
+            const std::string& listen_address,
+            unsigned short listen_port,
+            const std::vector<std::string>& digital_inputs,
             const std::vector<std::string>& digital_outputs);
+
+  std::string sentype;
+  std::string listen_address;
+  unsigned short listen_port;
 
   std::vector<std::string> digital_inputs;
   std::vector<std::string> digital_outputs;

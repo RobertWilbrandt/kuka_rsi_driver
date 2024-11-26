@@ -41,8 +41,8 @@ TEST(RsiWriter, WriteTestXmlNoIo)
 {
   const auto log = rclcpp::get_logger("rsi_writer");
 
-  RsiConfig config{{}, {}};
-  RsiWriter writer{&config, "TestSenType", log};
+  RsiConfig config{"TestSenType", "0.0.0.0", 49152, {}, {}};
+  RsiWriter writer{&config, log};
 
   // Create test command
   RsiCommand cmd;
@@ -71,8 +71,8 @@ TEST(RsiWriter, WriteTestXmlIo)
 {
   const auto log = rclcpp::get_logger("rsi_writer");
 
-  RsiConfig config{{}, {"do1", "do2"}};
-  RsiWriter writer{&config, "TestSenType", log};
+  RsiConfig config{"TestSenType", "0.0.0.0", 49152, {}, {"do1", "do2"}};
+  RsiWriter writer{&config, log};
 
   // Create test command
   RsiCommand cmd;
