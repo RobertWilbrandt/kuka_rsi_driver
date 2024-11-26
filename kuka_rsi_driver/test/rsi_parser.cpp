@@ -150,7 +150,7 @@ TEST(RsiParser, ParseTestXml)
 
   RsiConfig rsi_config{"TestSenType", "0.0.0.0", 49152, {}, {}};
   RsiFactory rsi_factory{rsi_config};
-  RsiParser rsi_parser{log, &rsi_factory};
+  RsiParser rsi_parser{&rsi_config, &rsi_factory, log};
 
   const auto buf = rsi_parser.buffer();
   ASSERT_GE(buf.size(), test_xml.size());

@@ -192,9 +192,13 @@ void XmlParser::setupParser()
   m_in_scope  = false;
 }
 
-RsiParser::RsiParser(rclcpp::Logger log, RsiFactory* rsi_factory, std::size_t buf_size)
+RsiParser::RsiParser(const RsiConfig* config,
+                     RsiFactory* rsi_factory,
+                     rclcpp::Logger log,
+                     std::size_t buf_size)
   : m_log{std::move(log)}
   , m_xml_parser{"Rob", m_log}
+  , m_rsi_config{config}
   , m_rsi_factory{rsi_factory}
 {
   m_xml_parser.addAttributeCb(
@@ -210,6 +214,7 @@ RsiParser::RsiParser(rclcpp::Logger log, RsiFactory* rsi_factory, std::size_t bu
 
   m_xml_parser.addAttributeCb(
     "GearTorque", [this](const char** attrs) { onAxisElement(ValueType::TORQUE, attrs); });
+  m_xml_parser.addAttributeCb("IO", [this](const char** attrs) { onIo(attrs); });
 
   m_xml_parser.addAttributeCb("ProgStatus", [this](const char** attrs) { onProgramState(attrs); });
   m_xml_parser.addAttributeCb("OvPro", [this](const char** attrs) { onOverwrite(attrs); });
@@ -366,6 +371,28 @@ void RsiParser::onDelay(const XML_Char** atts)
 void RsiParser::onIpoc(std::string_view text)
 {
   m_rsi_state->ipoc = parseNumber<std::size_t>(text);
+}
+
+void RsiParser::onIo(const XML_Char** atts)
+{
+  for (std::size_t i = 0; atts[i]; i += 2)
+  {
+    const char* name  = atts[i];
+    const char* value = atts[i + 1];
+
+    const auto io_i = i / 2;
+    if (io_i >= m_rsi_config->digital_inputs.size())
+    {
+      throw std::runtime_error{"Invalid number of io entries"};
+    }
+
+    if (m_rsi_config->digital_inputs[io_i] != name)
+    {
+      throw std::runtime_error{"Invalid IO entry"};
+    }
+
+    m_rsi_state->digital_inputs[io_i] = parseNumber<int>(value) == 0 ? false : true;
+  }
 }
 
 } // namespace kuka_rsi_driver

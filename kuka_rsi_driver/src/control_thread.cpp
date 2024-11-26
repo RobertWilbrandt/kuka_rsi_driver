@@ -47,7 +47,7 @@ ControlThread::ControlThread(const RsiConfig* config,
                              rclcpp::Logger log)
   : m_log{std::move(log)}
   , m_udp_server{config->listen_address, config->listen_port, std::chrono::milliseconds{1}}
-  , m_rsi_parser{m_log, rsi_factory}
+  , m_rsi_parser{config, rsi_factory, m_log}
   , m_rsi_writer{config, m_log}
   , m_control_buf{control_buf}
   , m_initial_cmd{rsi_factory->createCommand()}

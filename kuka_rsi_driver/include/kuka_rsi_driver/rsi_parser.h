@@ -147,11 +147,15 @@ class RsiParser
 public:
   /*! \brief Create a new parser
    *
-   * \param log Logger to use.
+   * \param rsi_config Configuration for communication
    * \param rsi_factory Factory for pre-allocated RSI states
+   * \param log Logger to use.
    * \param buf_size Size of parsing buffer to allocate. Only input within this size can be parsed.
    */
-  explicit RsiParser(rclcpp::Logger log, RsiFactory* rsi_factory, std::size_t buf_size = 1024);
+  explicit RsiParser(const RsiConfig* config,
+                     RsiFactory* rsi_factory,
+                     rclcpp::Logger log,
+                     std::size_t buf_size = 1024);
 
   RsiParser(const RsiParser&)            = delete;
   RsiParser& operator=(const RsiParser&) = delete;
@@ -186,11 +190,13 @@ private:
   void onProgramState(const XML_Char** atts);
   void onDelay(const XML_Char** atts);
   void onIpoc(std::string_view text);
+  void onIo(const XML_Char** atts);
 
   rclcpp::Logger m_log;
 
   XmlParser m_xml_parser;
 
+  const RsiConfig* m_rsi_config;
   RsiFactory* m_rsi_factory;
   std::shared_ptr<RsiState> m_rsi_state;
 };
