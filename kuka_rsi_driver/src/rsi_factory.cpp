@@ -37,8 +37,9 @@
 
 namespace kuka_rsi_driver {
 
-RsiFactory::RsiFactory(std::size_t cyclic_buf_size)
-  : m_cmd_i{0}
+RsiFactory::RsiFactory(std::shared_ptr<RsiConfig> rsi_config, std::size_t cyclic_buf_size)
+  : m_rsi_config{std::move(rsi_config)}
+  , m_cmd_i{0}
   , m_state_i{0}
 {
   m_cmd_buf.reserve(cyclic_buf_size);
@@ -46,14 +47,24 @@ RsiFactory::RsiFactory(std::size_t cyclic_buf_size)
 
   for (std::size_t i = 0; i < cyclic_buf_size; ++i)
   {
-    m_cmd_buf.emplace_back(std::make_shared<RsiCommand>());
-    m_state_buf.emplace_back(std::make_shared<RsiState>());
+    m_cmd_buf.emplace_back(
+      std::make_shared<RsiCommand>(m_rsi_config->transmission_config.numBoolSignals(),
+                                   m_rsi_config->transmission_config.numDoubleSignals(),
+                                   m_rsi_config->transmission_config.numLongSignals()));
+    m_state_buf.emplace_back(
+      std::make_shared<RsiState>(m_rsi_config->reception_config.numBoolSignals(),
+                                 m_rsi_config->reception_config.numDoubleSignals(),
+                                 m_rsi_config->reception_config.numLongSignals()));
   }
 }
 
 RsiCommand RsiFactory::createCommand() const
 {
-  return RsiCommand{};
+  return RsiCommand{m_rsi_config->transmission_config.numBoolSignals(),
+                    m_rsi_config->transmission_config.numDoubleSignals(),
+                    m_rsi_config->transmission_config.numLongSignals()
+
+  };
 }
 
 std::shared_ptr<RsiCommand> RsiFactory::createCyclicCommand()

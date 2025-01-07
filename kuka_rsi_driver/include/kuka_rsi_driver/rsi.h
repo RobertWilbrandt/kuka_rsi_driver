@@ -38,6 +38,7 @@
 #include <array>
 #include <chrono>
 #include <cstdint>
+#include <vector>
 
 namespace kuka_rsi_driver {
 
@@ -113,10 +114,22 @@ enum class ProgramStatus : std::uint8_t
   STOPPED = 4
 };
 
+class RsiConfigElements
+{
+public:
+  RsiConfigElements(std::size_t num_bool, std::size_t num_double, std::size_t num_long);
+
+  std::vector<bool> bool_values;
+  std::vector<double> double_values;
+  std::vector<long> long_values;
+};
+
 class RsiState
 {
 public:
-  explicit RsiState();
+  RsiState(std::size_t num_config_bool   = 0,
+           std::size_t num_config_double = 0,
+           std::size_t num_config_long   = 0);
 
   JointArray axis_actual_pos;
   JointArray axis_setpoint_pos;
@@ -132,16 +145,22 @@ public:
   double speed_scaling;
 
   ProgramStatus program_status;
+
+  RsiConfigElements config_elements;
 };
 
 class RsiCommand
 {
 public:
-  RsiCommand();
+  RsiCommand(std::size_t num_config_bool   = 0,
+             std::size_t num_config_double = 0,
+             std::size_t num_config_long   = 0);
 
   std::chrono::steady_clock::time_point write_time;
 
   JointArray axis_command_pos;
+
+  RsiConfigElements config_elements;
 
 private:
 };

@@ -40,7 +40,7 @@ using namespace kuka_rsi_driver;
 
 TEST(ControlBuffer, interpolation)
 {
-  RsiFactory rsi_factory;
+  RsiFactory rsi_factory{std::make_shared<RsiConfig>()};
   ControlBuffer test_buf{rsi_factory};
 
   std::shared_ptr<RsiCommand> test_cmd_1 = rsi_factory.createCyclicCommand();

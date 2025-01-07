@@ -52,9 +52,10 @@ target_sources(kuka_rsi_driver
     src/control_thread.cpp
     src/hardware_interface.cpp
     src/phase_estimator.cpp
+    src/rsi.cpp
+    src/rsi_config.cpp
     src/rsi_factory.cpp
     src/rsi_parser.cpp
-    src/rsi.cpp
     src/rsi_writer.cpp
     src/udp_server.cpp
 )

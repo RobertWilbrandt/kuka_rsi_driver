@@ -193,13 +193,28 @@ void CartesianPose::getQuaternion(double& x, double& y, double& z, double& w) co
   w = ca * cb * cc + sa * sb * sc;
 }
 
-RsiState::RsiState()
+RsiConfigElements::RsiConfigElements(std::size_t num_bool,
+                                     std::size_t num_double,
+                                     std::size_t num_long)
+{
+  bool_values.resize(num_bool);
+  double_values.resize(num_double);
+  long_values.resize(num_long);
+}
+
+RsiState::RsiState(std::size_t num_config_bool,
+                   std::size_t num_config_double,
+                   std::size_t num_config_long)
   : delay{0}
   , ipoc{0}
+  , config_elements{num_config_bool, num_config_double, num_config_long}
 {
 }
 
-RsiCommand::RsiCommand()
+RsiCommand::RsiCommand(std::size_t num_config_bool,
+                       std::size_t num_config_double,
+                       std::size_t num_config_long)
+  : config_elements{num_config_bool, num_config_double, num_config_long}
 {
   axis_command_pos.fill(0.0);
 }

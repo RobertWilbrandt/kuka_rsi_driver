@@ -149,7 +149,7 @@ TEST(RsiParser, ParseTestXml)
 
   const auto log = rclcpp::get_logger("rsi_parser");
 
-  RsiFactory rsi_factory;
+  RsiFactory rsi_factory{std::make_shared<RsiConfig>()};
   RsiParser rsi_parser{log, &rsi_factory};
 
   const auto buf = rsi_parser.buffer();

@@ -191,7 +191,8 @@ KukaRsiHardwareInterface::on_init(const hardware_interface::HardwareInfo& info)
   RCLCPP_DEBUG(
     get_logger(), "Speed scaling state interface: %s", m_gpio_speed_scaling_state_iface.c_str());
 
-  m_rsi_factory.emplace();
+  const auto rsi_config = std::make_shared<RsiConfig>();
+  m_rsi_factory.emplace(rsi_config);
   m_control_buf.emplace(*m_rsi_factory);
 
   const auto listen_address = info_.hardware_parameters["listen_address"];
