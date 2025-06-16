@@ -258,7 +258,9 @@ void KukaRsiHardwareInterface::setState(const RsiState& state)
         break;
 
       case DataType::DOUBLE:
-        set_state(passthrough_index.name, state.passthrough.values_double[passthrough_index.index]);
+        set_state(passthrough_index.name,
+                  state.passthrough.values_double[passthrough_index.index] +
+                    passthrough_index.offset);
         break;
 
       case DataType::LONG:

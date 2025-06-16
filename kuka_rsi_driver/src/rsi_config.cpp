@@ -272,6 +272,14 @@ RsiConfig::parseInterfaces(std::span<const hardware_interface::InterfaceInfo> in
       }
     }
 
+    // Get offset
+    double offset = 0.0;
+    if (const auto rsi_offset_it = interface.parameters.find("offset");
+        rsi_offset_it != interface.parameters.end())
+    {
+      offset = std::stod(rsi_offset_it->second);
+    }
+
     // Create new index
     const auto state_index = [&]() {
       switch (type)
@@ -288,16 +296,18 @@ RsiConfig::parseInterfaces(std::span<const hardware_interface::InterfaceInfo> in
     }();
 
     RCLCPP_INFO(m_log,
-                "    %s/%s - %c[%zu] - %s.%s",
+                "    %s/%s - %c[%zu] (offset %.03f) - %s.%s",
                 component.name.c_str(),
                 interface.name.c_str(),
                 type_c,
                 state_index,
+                offset,
                 tag_name.c_str(),
                 attribute_name.c_str());
 
     tag.indices.emplace_back(attribute_name, state_index, type);
-    interface_indices.emplace_back(state_index, component.name + '/' + interface.name, type);
+    interface_indices.emplace_back(
+      state_index, component.name + '/' + interface.name, type, offset);
   }
 
   return std::make_pair(interface_indices, tag);

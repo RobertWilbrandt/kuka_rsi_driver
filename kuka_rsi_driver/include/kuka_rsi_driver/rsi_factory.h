@@ -46,8 +46,8 @@ namespace kuka_rsi_driver {
 class RsiFactory
 {
 public:
-  explicit RsiFactory(std::size_t cyclic_buf_size = 1024);
-  explicit RsiFactory(std::shared_ptr<RsiConfig> config, std::size_t cyclic_buf_size = 1024);
+  explicit RsiFactory(std::size_t cyclic_buf_size = 50000);
+  explicit RsiFactory(std::shared_ptr<RsiConfig> config, std::size_t cyclic_buf_size = 50000);
 
   RsiCommand createCommand() const;
   std::shared_ptr<RsiCommand> createCyclicCommand();

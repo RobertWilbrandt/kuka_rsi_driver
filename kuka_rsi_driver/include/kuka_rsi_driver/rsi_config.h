@@ -63,6 +63,8 @@ struct InterfaceIndex
   std::string name;
   //! Data type
   DataType type;
+
+  double offset;
 };
 
 /*! \brief Definition of all state and command interfaces
