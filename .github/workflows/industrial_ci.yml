@@ -9,6 +9,10 @@ on:
       ros_repo:
         required: true
         type: string
+      upstream_exclude:
+        required: false
+        type: string
+        default: ""
 
 jobs:
   industrial_ci:
@@ -20,5 +24,5 @@ jobs:
         env:
           ROS_DISTRO: ${{ inputs.ros_distro }}
           ROS_REPO: ${{ inputs.ros_repo }}
-          UPSTREAM_WORKSPACE: kuka_rsi_driver.${{ inputs.ros_distro }}.repos
+          UPSTREAM_WORKSPACE: "kuka_rsi_driver.${{ inputs.ros_distro }}.repos ${{ inputs.upstream_exclude }}"
           UPSTREAM_CMAKE_ARGS: -DBUILD_TESTING:BOOL=Off

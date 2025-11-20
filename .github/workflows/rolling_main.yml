@@ -13,3 +13,4 @@ jobs:
     with:
       ros_distro: rolling
       ros_repo: main
+      upstream_exclude: -kuka_experimental/kuka_experimental -kuka_experimental/kuka_ros2_control_support -kuka_experimental/kuka_rsi_simulator -kuka_experimental/kuka_common_moveit
